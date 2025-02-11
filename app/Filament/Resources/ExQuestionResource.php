@@ -72,7 +72,13 @@ class ExQuestionResource extends Resource
 
                 RichEditor::make('content')
                     ->required()
-                    ->columnSpanFull(),
+                    ->label("Question")
+                    ->columnSpanFull()
+                    ->fileAttachmentsDirectory('exercise/images')
+                    ->fileAttachmentsVisibility('public')
+                    ->columnSpanFull()
+                    ->extraAttributes(['class' => 'h-96']),
+
                 Repeater::make('options')
                     ->label('Answer Options')
                     ->schema([
@@ -111,6 +117,14 @@ class ExQuestionResource extends Resource
                     ->required()
                     ->visible(fn(Forms\Get $get) => $get('type') === 'essay'),
 
+                RichEditor::make('feedback')
+                    ->label("Feedback or Explanation")
+                    ->placeholder("Input feedback or explanation of the right answer here...")
+                    ->columnSpanFull()
+                    ->fileAttachmentsDirectory('exercise/images')
+                    ->fileAttachmentsVisibility('public')
+                    ->columnSpanFull()
+                    ->extraAttributes(['class' => 'h-96']),
             ]);
     }
 
