@@ -26,9 +26,9 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
-            $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
-            $table->foreign('level_id')->references('id')->on('levels')->onDelete('cascade');
+            // $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
+            // $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
+            // $table->foreign('level_id')->references('id')->on('levels')->onDelete('cascade');
         });
     }
 

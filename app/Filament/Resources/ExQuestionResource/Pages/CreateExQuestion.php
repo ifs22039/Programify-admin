@@ -23,6 +23,7 @@ class CreateExQuestion extends CreateRecord
                 'content' => $data['content'],
                 'point' => $data['point'],
                 'exp' => $data['exp'],
+                'feedback' => $data['feedback'] ?? null,
             ]);
 
             if ($data['type'] === 'multiple_choice' && isset($data['options'])) {
