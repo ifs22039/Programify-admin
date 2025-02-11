@@ -34,9 +34,6 @@
                                                 "id": {
                                                     "type": "number"
                                                 },
-                                                "email": {
-                                                    "type": "string"
-                                                },
                                                 "name": {
                                                     "type": "string"
                                                 }

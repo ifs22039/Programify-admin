@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Hash;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -27,6 +28,7 @@ class User extends Authenticatable
         'total_point',
         'total_exp',
         'level_id',
+        'token'
     ];
 
     /**
@@ -67,12 +69,15 @@ class User extends Authenticatable
     {
         static::creating(function ($model) {
             $model->level_id = 1;
-            $model->created_by = auth()->id();
-            $model->updated_by = auth()->id();
+            $model->created_by = auth()->id() ?? 1;
+            $model->updated_by = auth()->id() ?? 1;
+            if (!empty($model->password)) {
+                $model->password = Hash::make($model->password);
+            }
         });
 
-        static::creating(function ($model) {
-            $model->updated_by = auth()->id();
+        static::updating(function ($model) {
+            $model->updated_by = auth()->id() ?? 1;
         });
     }
 }
