@@ -65,19 +65,19 @@ class User extends Authenticatable
         return $this->belongsTo(Level::class, "level_id");
     }
 
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->level_id = 1;
-            $model->created_by = auth()->id() ?? 1;
-            $model->updated_by = auth()->id() ?? 1;
-            if (!empty($model->password)) {
-                $model->password = Hash::make($model->password);
-            }
-        });
-
-        static::updating(function ($model) {
-            $model->updated_by = auth()->id() ?? 1;
-        });
-    }
+//    protected static function booted()
+//    {
+//        static::creating(function ($model) {
+//            $model->level_id = 1;
+//            $model->created_by = auth()->id() ?? 1;
+//            $model->updated_by = auth()->id() ?? 1;
+//            if (!empty($model->password)) {
+//                $model->password = Hash::make($model->password);
+//            }
+//        });
+//
+//        static::updating(function ($model) {
+//            $model->updated_by = auth()->id() ?? 1;
+//        });
+//    }
 }

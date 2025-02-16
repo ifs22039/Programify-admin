@@ -51,6 +51,8 @@ class ExQuestionResource extends Resource
                         'multiple_choice' => 'Multiple Choice',
                         'true_false' => 'True or False',
                         'essay' => 'Essay',
+                        'multiple_answer' => 'Multiple Answer of Multiple Choice',
+                        'short_answer' => 'Short Answer',
                     ])
                     ->required()
                     ->reactive()
@@ -77,6 +79,7 @@ class ExQuestionResource extends Resource
                     ->fileAttachmentsDirectory('exercise/images')
                     ->fileAttachmentsVisibility('public')
                     ->columnSpanFull()
+                    ->placeholder('Input content of the question here...')
                     ->extraAttributes(['class' => 'h-96']),
 
                 Repeater::make('options')
@@ -85,7 +88,27 @@ class ExQuestionResource extends Resource
                         Forms\Components\RichEditor::make('option')
                             ->label('Option')
                             ->required()
-                            ->maxLength(255)
+                            ->columnSpanFull(),
+                        Forms\Components\Radio::make('is_correct')
+                            ->label('Is Correct?')
+                            ->default(false)
+                            ->boolean()
+                            ->columnSpanFull(),
+                    ])
+                    ->minItems(2)
+                    ->grid(2)
+                    ->maxItems(6)
+                    ->columns(2)
+                    ->required()
+                    ->columnSpanFull()
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_choice'),
+
+                Repeater::make('options')
+                    ->label('Answer Options')
+                    ->schema([
+                        Forms\Components\RichEditor::make('option')
+                            ->label('Option')
+                            ->required()
                             ->columnSpanFull(),
                         Forms\Components\Radio::make('is_correct')
                             ->label('Is Correct?')
@@ -99,7 +122,7 @@ class ExQuestionResource extends Resource
                     ->columns(2)
                     ->required()
                     ->columnSpanFull()
-                    ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_choice'),
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_answer'),
 
                 Radio::make('true_false_answer')
                     ->label('Correct Answer')
@@ -112,10 +135,17 @@ class ExQuestionResource extends Resource
 
                 RichEditor::make('essay_answer')
                     ->required()
-                    ->maxLength(255)
                     ->columnSpanFull()
                     ->required()
                     ->visible(fn(Forms\Get $get) => $get('type') === 'essay'),
+
+                TextInput::make('short_answer')
+                    ->label('Correct Answer')
+                    ->required()
+                    ->columnSpanFull()
+                    ->required()
+                    ->placeholder('Input correct answer here...')
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'short_answer'),
 
                 RichEditor::make('feedback')
                     ->label("Feedback or Explanation")
@@ -124,7 +154,7 @@ class ExQuestionResource extends Resource
                     ->fileAttachmentsDirectory('exercise/images')
                     ->fileAttachmentsVisibility('public')
                     ->columnSpanFull()
-                    ->extraAttributes(['class' => 'h-96']),
+                    ->extraAttributes(['class' => 'h-40']),
             ]);
     }
 

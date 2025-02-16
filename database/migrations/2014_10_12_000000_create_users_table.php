@@ -14,21 +14,23 @@ return new class extends Migration {
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->string('nim');
+            $table->integer('angkatan');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->timestamp("last_login")->default(now());
             $table->integer("total_point")->default(0);
             $table->integer("total_exp")->default(0);
             $table->unsignedBigInteger("level_id");
-            $table->unsignedBigInteger("created_by");
-            $table->unsignedBigInteger("updated_by");
+            $table->unsignedBigInteger("created_by")->nullable();
+            $table->unsignedBigInteger("updated_by")->nullable();
             $table->string("token", 100)->nullable();
             $table->rememberToken();
             $table->timestamps();
 
-            // $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
-            // $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
-            // $table->foreign('level_id')->references('id')->on('levels')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
+            $table->foreign('level_id')->references('id')->on('levels')->onDelete('cascade');
         });
     }
 

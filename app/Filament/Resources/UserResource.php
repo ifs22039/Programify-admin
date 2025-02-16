@@ -36,6 +36,18 @@ class UserResource extends Resource
                     ->columnSpanFull()
                     ->unique(fn($livewire) => $livewire->getRecord())
                     ->disabled(fn($livewire) => $livewire->getRecord()),
+                Forms\Components\TextInput::make('nim')
+                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->maxLength(255)
+                    ->autocapitalize()
+                    ->columnSpanFull(),
+                Forms\Components\TextInput::make('angkatan')
+                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->minLength(4)
+                    ->maxLength(4)
+                    ->mask('9999')
+                    ->integer()
+                    ->columnSpanFull(),
                 Forms\Components\TextInput::make('password')
                     ->required(fn($livewire) => !$livewire->getRecord())
                     ->maxLength(255)
@@ -66,14 +78,22 @@ class UserResource extends Resource
                     ->label("Total Point"),
                 Tables\Columns\TextColumn::make('total_exp')
                     ->label("Total Exp"),
-                Tables\Columns\TextColumn::make('creator.name')
+//                Tables\Columns\TextColumn::make('created_by')
+//                    ->label("Created By")
+//                    ->formatStateUsing(fn($record) => ($record->created_by ? $record->created_by : 'N/A') . "<br/> <hr/>" . $record->created_at)
+//                    ->html(),
+//                Tables\Columns\TextColumn::make('updated_by')
+//                    ->label("Updated By")
+//                    ->formatStateUsing(fn() => "System")
+//                    ->html(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->formatStateUsing(fn($record) => ($record->created_by ? $record->creator->name : "System") . "<br/> <hr/>" . $record->created_at)
                     ->label("Created By")
-                    ->formatStateUsing(fn($record) => $record->creator->name . "<br/> <hr/>" . $record->created_at)
                     ->html(),
-                Tables\Columns\TextColumn::make('updater.name')
+                Tables\Columns\TextColumn::make('updated_at')
                     ->label("Updated By")
-                    ->formatStateUsing(fn($record) => $record->updater->name . "<br/> <hr/>" . $record->updated_at)
-                    ->html(),
+                    ->formatStateUsing(fn($record) => ($record->updated_by ? $record->updater->name : "System") . "<br/> <hr/>" . $record->created_at)
+                    ->html()
             ])
             ->filters([
                 //

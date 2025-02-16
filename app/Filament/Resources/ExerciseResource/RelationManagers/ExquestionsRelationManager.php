@@ -52,7 +52,7 @@ class ExquestionsRelationManager extends RelationManager
                     ->html()
                     ->label('Options')
                     ->formatStateUsing(fn($record) => $record->exanswers->pluck('content')
-                        // ->map(fn($content) => '- ' . $content)
+//                        ->map(fn($content) => '- ' . $content)
                         ->implode('<br>'))
                     ->wrap()
             ])
@@ -71,7 +71,7 @@ class ExquestionsRelationManager extends RelationManager
                 Tables\Actions\EditAction::make()
                     ->label('Edit')
                     ->modal(false)
-                    ->url(fn($record) =>  route('filament.admin.resources.ex-questions.edit', $record)),
+                    ->url(fn($record) => route('filament.admin.resources.ex-questions.edit', $record)),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([

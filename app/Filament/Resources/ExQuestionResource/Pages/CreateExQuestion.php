@@ -46,6 +46,12 @@ class CreateExQuestion extends CreateRecord
                     'content' => $data['essay_answer'],
                     'is_correct' => false,
                 ]);
+            } elseif ($data['type'] === 'short_answer') {
+                ExAnswer::create([
+                    'ex_question_id' => $question->id,
+                    'content' => $data['short_answer'],
+                    'is_correct' => true,
+                ]);
             }
 
             return $question;

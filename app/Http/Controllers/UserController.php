@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserLoginRequest;
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Requests\UserUpdateRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -30,6 +31,11 @@ class UserController extends Controller
         }
 
         $user = new User($data);
+        $user->nim = strtoupper($data['nim']);
+        $user->password = Hash::make($data['password']);
+        $user->level_id = 1;
+        $user->created_by = null;
+        $user->updated_by = null;
         $user->save();
 
         return (new UserResource($user))->response()->setStatusCode(201);
@@ -57,8 +63,47 @@ class UserController extends Controller
         return (new UserResource($user))->response()->setStatusCode(200);
     }
 
-    public function get(): UserResource {
+    public function get(): UserResource
+    {
         $user = Auth::user();
         return new UserResource($user);
+    }
+
+    public function update(UserUpdateRequest $request): UserResource
+    {
+        $data = $request->validated();
+
+        $user = Auth::user();
+
+        if (isset($data['name'])) {
+            $user->name = $data['name'];
+        }
+
+        if (isset($data['nim'])) {
+            $user->nim = $data['nim'];
+        }
+
+        if (isset($data['angkatan'])) {
+            $user->angkatan = $data['angkatan'];
+        }
+
+        if (isset($data['password']) && isset($data['password_confirmation'])) {
+            $user->name = Hash::make($data['password']);
+        }
+
+        $user->save();
+
+        return new UserResource($user);
+    }
+
+    public function logout(): JsonResponse
+    {
+        $user = Auth::user();
+        $user->token = null;
+        $user->save();
+
+        return response()->json([
+            "data" => "true"
+        ])->setStatusCode(200);
     }
 }

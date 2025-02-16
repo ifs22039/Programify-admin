@@ -22,20 +22,40 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Sucess get all topics",
+                        "description": "Success get all topics",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "type": "object",
                                     "properties": {
                                         "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "type": "object",
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "number"
+                                                    },
+                                                    "name": {
+                                                        "type": "string"
+                                                    },
+                                                    "progress": {
+                                                        "type": "number"
+                                                    }
+                                                }
+                                            }
+                                        },
+                                        "pagination": {
                                             "type": "object",
                                             "properties": {
-                                                "id": {
+                                                "totalPage": {
                                                     "type": "number"
                                                 },
-                                                "name": {
-                                                    "type": "string"
+                                                "size": {
+                                                    "type": "number"
+                                                },
+                                                "currentPage": {
+                                                    "type": "number"
                                                 }
                                             }
                                         },
@@ -65,7 +85,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Success get topic",
+                        "description": "Success get detail of topic",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -79,6 +99,37 @@
                                                 },
                                                 "name": {
                                                     "type": "string"
+                                                },
+                                                "progress": {
+                                                    "type": "number"
+                                                },
+                                                "lessons": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "object",
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "number"
+                                                            },
+                                                            "name": {
+                                                                "type": "string"
+                                                            },
+                                                            "exercises": {
+                                                                "type": "array",
+                                                                "items": {
+                                                                    "type": "object",
+                                                                    "properties": {
+                                                                        "id": {
+                                                                            "type": "number"
+                                                                        },
+                                                                        "title": {
+                                                                            "type": "string"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
                                                 }
                                             }
                                         },
@@ -95,3 +146,4 @@
         }
     }
 }
+
