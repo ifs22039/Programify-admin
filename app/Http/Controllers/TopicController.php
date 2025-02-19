@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\TopicResource;
+use App\Models\TakeLesson;
 use App\Models\Topic;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\Request;
@@ -14,7 +15,7 @@ class TopicController extends Controller
     {
         $topic = Topic::where('id', $id)->first();
 
-        if(!$topic) {
+        if (!$topic) {
             throw new HttpResponseException(response()->json([
                 'errors' => [
                     'message' => [
