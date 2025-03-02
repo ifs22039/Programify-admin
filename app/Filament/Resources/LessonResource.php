@@ -43,6 +43,12 @@ class LessonResource extends Resource
                     ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
+                TextInput::make('exp')
+                    ->label('Reward Exp')
+                    ->required()
+                    ->columnSpanFull()
+                    ->integer()
+                    ->default(10),
                 RichEditor::make('content')
                     ->required()
                     ->fileAttachmentsDirectory('lessons/images')
