@@ -18,6 +18,7 @@ return new class extends Migration
             $table->unsignedBigInteger("ex_question_id");
             $table->unsignedBigInteger("created_by");
             $table->unsignedBigInteger("updated_by");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
 
             $table->foreign('ex_question_id')->references('id')->on('ex_questions')->onDelete('cascade');

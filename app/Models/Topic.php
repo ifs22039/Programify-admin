@@ -20,4 +20,9 @@ class Topic extends Model
     {
         return $this->hasMany(Lesson::class);
     }
+
+    public function takeLessons(): HasMany
+    {
+        return $this->hasMany(TakeLesson::class);
+    }
 }

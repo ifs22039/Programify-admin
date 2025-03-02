@@ -13,8 +13,8 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::get('/', function () {
-//    return redirect('/admin');
-//});
+Route::get('/', function () {
+   return redirect('/admin');
+});
 
-Route::get('/', [\App\Http\Controllers\Controller::class, 'autoGraderEssay']);
+// Route::get('/', [\App\Http\Controllers\Controller::class, 'autoGraderEssay']);

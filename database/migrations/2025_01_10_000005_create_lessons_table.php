@@ -11,14 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('levels', function (Blueprint $table) {
+        Schema::create('lessons', function (Blueprint $table) {
             $table->id();
-            $table->integer("level")->unique();
-            $table->integer("exp_needed");
+            $table->unsignedBigInteger("topic_id");
+            $table->string("name");
+            $table->longText("content");
+            $table->integer("exp");
             $table->unsignedBigInteger("created_by");
             $table->unsignedBigInteger("updated_by");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
 
+            $table->foreign('topic_id')->references('id')->on('topics')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
             $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
         });
@@ -29,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('levels');
+        Schema::dropIfExists('lessons');
     }
 };

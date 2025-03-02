@@ -14,11 +14,14 @@ return new class extends Migration
         Schema::create('exercises', function (Blueprint $table) {
             $table->id();
             $table->string("title");
+            $table->unsignedBigInteger("topic_id");
             $table->unsignedBigInteger("lesson_id");
             $table->unsignedBigInteger("created_by");
             $table->unsignedBigInteger("updated_by");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
 
+            $table->foreign('topic_id')->references('id')->on('topics')->onDelete('cascade');
             $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
             $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
             $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');

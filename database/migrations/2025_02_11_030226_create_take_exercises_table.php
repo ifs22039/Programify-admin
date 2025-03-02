@@ -13,9 +13,12 @@ return new class extends Migration {
         Schema::create('take_exercises', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("exercise_id");
+            $table->unsignedBigInteger("topic_id");
+            $table->unsignedBigInteger("lesson_id");
             $table->unsignedBigInteger("user_id");
             $table->unsignedBigInteger("take_exercise_answer_id");
             $table->integer("score");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
         });
     }

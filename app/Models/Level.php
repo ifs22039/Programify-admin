@@ -26,12 +26,4 @@ class Level extends Model
     {
         return $this->belongsTo(Admin::class, "updated_by");
     }
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->created_by = auth()->id();
-            $model->updated_by = auth()->id();
-        });
-    }
 }

@@ -43,20 +43,20 @@ class Admin extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
-    protected static function boot()
-    {
-        parent::boot();
+    // protected static function boot()
+    // {
+    //     parent::boot();
 
-        static::creating(function ($admin) {
-            if (!empty($admin->password)) {
-                $admin->password = Hash::make($admin->password);
-            }
-        });
+    //     static::creating(function ($admin) {
+    //         if (!empty($admin->password)) {
+    //             $admin->password = Hash::make($admin->password);
+    //         }
+    //     });
 
-        static::updating(function ($admin) {
-            if (!empty($admin->password) && $admin->isDirty('password')) {
-                $admin->password = Hash::make($admin->password);
-            }
-        });
-    }
+    //     static::updating(function ($admin) {
+    //         if (!empty($admin->password) && $admin->isDirty('password')) {
+    //             $admin->password = Hash::make($admin->password);
+    //         }
+    //     });
+    // }
 }

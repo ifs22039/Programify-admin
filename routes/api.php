@@ -26,6 +26,7 @@ Route::middleware(\App\Http\Middleware\ApiAuthMiddleware::class)->group(function
     Route::patch('/users/current', [\App\Http\Controllers\UserController::class, 'update']);
     Route::delete('/users/logout', [\App\Http\Controllers\UserController::class, 'logout']);
 
+    Route::get('/topics', [\App\Http\Controllers\TopicController::class, 'all']);
     Route::get('/topics/{id}', [\App\Http\Controllers\TopicController::class, 'get'])->where('id', '[0-9]+');
 
     Route::get('/lessons/{id}', [\App\Http\Controllers\LessonController::class, 'get'])->where('id', '[0-9]+');

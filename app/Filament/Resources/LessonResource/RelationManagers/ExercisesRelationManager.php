@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\LessonResource\RelationManagers;
 
 use Filament\Forms;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
@@ -16,8 +17,13 @@ class ExercisesRelationManager extends RelationManager
 
     public function form(Form $form): Form
     {
+        $lesson = $this->getOwnerRecord();
+
         return $form
             ->schema([
+                Forms\Components\Hidden::make('topic_id')
+                    ->required()
+                    ->default($lesson->topic_id),
                 Forms\Components\TextInput::make('title')
                     ->required()
                     ->columnSpanFull()
@@ -43,7 +49,7 @@ class ExercisesRelationManager extends RelationManager
             ->actions([
                 Tables\Actions\EditAction::make()
                     ->label('Edit')
-                    ->modal(false) // Disable modal
+                    ->modal(false)
                     ->url(fn($record) =>  route('filament.admin.resources.exercises.edit', $record)),
                 Tables\Actions\DeleteAction::make(),
             ])

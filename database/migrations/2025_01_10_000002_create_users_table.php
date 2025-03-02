@@ -24,7 +24,7 @@ return new class extends Migration {
             $table->unsignedBigInteger("level_id");
             $table->unsignedBigInteger("created_by")->nullable();
             $table->unsignedBigInteger("updated_by")->nullable();
-            $table->string("token", 100)->nullable();
+            $table->timestamp("deleted_at")->nullable();
             $table->rememberToken();
             $table->timestamps();
 

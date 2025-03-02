@@ -49,7 +49,14 @@ class LessonResource extends Resource
                     ->fileAttachmentsVisibility('public')
                     ->placeholder('Input content of the lesson here...')
                     ->columnSpanFull()
-                    ->extraAttributes(['class' => 'h-96']),
+                    ->extraAttributes([
+                        'class' => 'h-96',
+                        'data-tinymce' => json_encode([
+                            'plugins' => 'alignleft aligncenter alignright | link',
+                            'toolbar' => 'alignleft aligncenter alignright | undo redo | bold italic | link',
+                            'toolbar_mode' => 'wrap',
+                        ])
+                    ]),
             ]);
     }
 

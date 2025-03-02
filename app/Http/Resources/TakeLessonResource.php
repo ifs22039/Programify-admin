@@ -5,7 +5,7 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class TopicResource extends JsonResource
+class TakeLessonResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -16,8 +16,9 @@ class TopicResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'name' => $this->name,
-            'lessons' => $this->lessons->map(fn($lesson) => $lesson->only(['id', 'name']))
+            'topic_id' => $this->topic_id,
+            'lesson_id' => $this->lesson_id,
+            'user_id' => $this->user_id
         ];
     }
 }
