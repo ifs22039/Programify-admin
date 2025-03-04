@@ -52,6 +52,14 @@ class CreateExQuestion extends CreateRecord
                     'content' => $data['short_answer'],
                     'is_correct' => true,
                 ]);
+            } elseif ($data['type'] === 'multiple_answer' && isset($data['options'])) {
+                foreach ($data['options'] as $option) {
+                    ExAnswer::create([
+                        'ex_question_id' => $question->id,
+                        'content' => $option['option'],
+                        'is_correct' => $option['is_correct'] ?? false,
+                    ]);
+                }
             }
 
             return $question;

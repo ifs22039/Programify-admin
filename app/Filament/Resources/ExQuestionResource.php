@@ -88,7 +88,8 @@ class ExQuestionResource extends Resource
                         Forms\Components\RichEditor::make('option')
                             ->label('Option')
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->extraInputAttributes(['style' => 'min-height: 5rem !important;']),
                         Forms\Components\Radio::make('is_correct')
                             ->label('Is Correct?')
                             ->default(false)
@@ -109,7 +110,8 @@ class ExQuestionResource extends Resource
                         Forms\Components\RichEditor::make('option')
                             ->label('Option')
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->extraInputAttributes(['style' => 'min-height: 5rem !important;']),
                         Forms\Components\Radio::make('is_correct')
                             ->label('Is Correct?')
                             ->default(false)
@@ -118,7 +120,7 @@ class ExQuestionResource extends Resource
                     ])
                     ->minItems(2)
                     ->grid(2)
-                    ->maxItems(4)
+                    ->maxItems(6)
                     ->columns(2)
                     ->required()
                     ->columnSpanFull()
