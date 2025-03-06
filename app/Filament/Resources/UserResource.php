@@ -7,6 +7,8 @@ use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -26,41 +28,43 @@ class UserResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('email')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required(fn($livewire) => $livewire instanceof CreateRecord)
                     ->email()
                     ->maxLength(255)
                     ->columnSpanFull()
-                    ->unique(fn($livewire) => $livewire->getRecord())
-                    ->disabled(fn($livewire) => $livewire->getRecord()),
+                    ->unique(ignoreRecord: true)
+                    ->disabled(fn($livewire) => $livewire instanceof EditRecord),
                 Forms\Components\TextInput::make('nim')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required()
                     ->maxLength(255)
                     ->autocapitalize()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('angkatan')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required()
                     ->minLength(4)
                     ->maxLength(4)
                     ->mask('9999')
                     ->integer()
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('password')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required(fn($livewire) => $livewire instanceof CreateRecord)
                     ->maxLength(255)
                     ->columnSpanFull()
                     ->password()
-                    ->confirmed(),
+                    ->confirmed()
+                    ->hidden(fn($livewire) => $livewire instanceof EditRecord),
                 Forms\Components\TextInput::make('password_confirmation')
                     ->label("Password Confirmation")
                     ->password()
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required(fn($livewire) => $livewire instanceof CreateRecord)
                     ->columnSpanFull()
                     ->maxLength(255)
-                    ->dehydrated(false),
+                    ->dehydrated(false)
+                    ->hidden(fn($livewire) => $livewire instanceof EditRecord),
             ]);
     }
 
@@ -78,14 +82,14 @@ class UserResource extends Resource
                     ->label("Total Point"),
                 Tables\Columns\TextColumn::make('total_exp')
                     ->label("Total Exp"),
-//                Tables\Columns\TextColumn::make('created_by')
-//                    ->label("Created By")
-//                    ->formatStateUsing(fn($record) => ($record->created_by ? $record->created_by : 'N/A') . "<br/> <hr/>" . $record->created_at)
-//                    ->html(),
-//                Tables\Columns\TextColumn::make('updated_by')
-//                    ->label("Updated By")
-//                    ->formatStateUsing(fn() => "System")
-//                    ->html(),
+                //                Tables\Columns\TextColumn::make('created_by')
+                //                    ->label("Created By")
+                //                    ->formatStateUsing(fn($record) => ($record->created_by ? $record->created_by : 'N/A') . "<br/> <hr/>" . $record->created_at)
+                //                    ->html(),
+                //                Tables\Columns\TextColumn::make('updated_by')
+                //                    ->label("Updated By")
+                //                    ->formatStateUsing(fn() => "System")
+                //                    ->html(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->formatStateUsing(fn($record) => ($record->created_by ? $record->creator->name : "System") . "<br/> <hr/>" . $record->created_at)
                     ->label("Created By")

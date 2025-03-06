@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('markets', function (Blueprint $table) {
             $table->id();
-            $table->enum('type', ['Avatar', 'Border']);
+            $table->enum('type', ['Avatar', 'Gift']);
             $table->string("title");
             $table->longText("picture");
             $table->bigInteger("price");

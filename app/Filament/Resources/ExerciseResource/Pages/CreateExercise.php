@@ -16,6 +16,15 @@ class CreateExercise extends CreateRecord
         return $this->previousUrl ?? $this->getResource()::getUrl('index');
     }
 
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+            // ...(static::canCreateAnother() ? [$this->getCreateAnotherFormAction()] : []),
+            $this->getCancelFormAction(),
+        ];
+    }
+
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $lesson = Lesson::find($data["lesson_id"]);

@@ -7,6 +7,8 @@ use App\Filament\Resources\AdminResource\RelationManagers;
 use App\Models\Admin;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Resources\Pages\CreateRecord;
+use Filament\Resources\Pages\EditRecord;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -55,29 +57,31 @@ class AdminResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required()
                     ->maxLength(255)
                     ->columnSpanFull(),
                 Forms\Components\TextInput::make('email')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required(fn($livewire) => $livewire instanceof CreateRecord)
                     ->email()
                     ->maxLength(255)
                     ->columnSpanFull()
-                    ->unique(fn($livewire) => $livewire->getRecord())
-                    ->disabled(fn($livewire) => $livewire->getRecord()),
+                    ->unique(ignoreRecord: true)
+                    ->disabled(fn($livewire) => $livewire instanceof EditRecord),
                 Forms\Components\TextInput::make('password')
-                    ->required(fn($livewire) => !$livewire->getRecord())
+                    ->required(fn($livewire) => $livewire instanceof CreateRecord)
                     ->maxLength(255)
                     ->columnSpanFull()
                     ->password()
-                    ->confirmed(),
+                    ->confirmed()
+                    ->hidden(fn($livewire) => $livewire instanceof EditRecord),
                 Forms\Components\TextInput::make('password_confirmation')
                     ->label("Password Confirmation")
+                    ->required(fn($livewire) => $livewire instanceof CreateRecord)
                     ->password()
-                    ->required(fn($livewire) => !$livewire->getRecord())
                     ->columnSpanFull()
                     ->maxLength(255)
-                    ->dehydrated(false),
+                    ->dehydrated(false)
+                    ->hidden(fn($livewire) => $livewire instanceof EditRecord),
             ]);
     }
 

@@ -41,7 +41,7 @@ class MarketResource extends Resource
                     ->label('Quest Type')
                     ->options([
                         'Avatar' => 'Avatar',
-                        'Border' => 'Border',
+                        'Gift' => 'Gift',
                     ])
                     ->required()
                     ->reactive()
@@ -54,7 +54,6 @@ class MarketResource extends Resource
                     ->default(0),
 
                 FileUpload::make('picture')
-                    // ->label('Picture')
                     ->label('Picture')
                     ->image()
                     ->required()

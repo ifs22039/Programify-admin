@@ -21,4 +21,17 @@ class EditAdmin extends EditRecord
             Actions\DeleteAction::make(),
         ];
     }
+
+    protected function handleRecordUpdate(Model $record, array $data): Admin
+    {
+        return DB::transaction(function () use ($data) {
+            $admin = $this->record;
+
+            $admin->name = $data["name"];
+
+            $admin->save();
+
+            return $admin;
+        });
+    }
 }
