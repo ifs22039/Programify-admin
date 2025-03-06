@@ -57,6 +57,7 @@ class ExQuestionResource extends Resource
                     ->required()
                     ->reactive()
                     ->columnSpanFull(),
+                // ->default(),
 
                 TextInput::make('point')
                     ->label('Reward Poin')
@@ -98,13 +99,14 @@ class ExQuestionResource extends Resource
                     ])
                     ->minItems(2)
                     ->grid(2)
-                    ->maxItems(6)
+                    ->maxItems(4)
+                    ->defaultItems(2)
                     ->columns(2)
                     ->required()
                     ->columnSpanFull()
                     ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_choice'),
 
-                Repeater::make('options')
+                Repeater::make('multiple_options')
                     ->label('Answer Options')
                     ->schema([
                         Forms\Components\RichEditor::make('option')
@@ -122,6 +124,7 @@ class ExQuestionResource extends Resource
                     ->grid(2)
                     ->maxItems(6)
                     ->columns(2)
+                    ->defaultItems(2)
                     ->required()
                     ->columnSpanFull()
                     ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_answer'),

@@ -18,6 +18,9 @@ return new class extends Migration
             $table->unsignedBigInteger("updated_by");
             $table->timestamps();
             $table->timestamp("deleted_at")->nullable();
+
+            $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
         });
     }
 

@@ -28,6 +28,12 @@ class ExercisesRelationManager extends RelationManager
                     ->required()
                     ->columnSpanFull()
                     ->maxLength(255),
+                Hidden::make('created_by')
+                    ->required()
+                    ->default(auth()->id()),
+                Hidden::make('updated_by')
+                    ->required()
+                    ->default(auth()->id()),
             ]);
     }
 

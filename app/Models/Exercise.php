@@ -27,12 +27,4 @@ class Exercise extends Model
     {
         return $this->hasMany(ExQuestion::class);
     }
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->created_by = auth()->id();
-            $model->updated_by = auth()->id();
-        });
-    }
 }

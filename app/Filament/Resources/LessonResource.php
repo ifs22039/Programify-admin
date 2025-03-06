@@ -39,6 +39,7 @@ class LessonResource extends Resource
                     ->columnSpanFull()
                     ->disabled(fn() => $topic_id ?? $topic_id)
                     ->default(fn() => $topic_id ?? $topic_id),
+
                 Forms\Components\TextInput::make('name')
                     ->required()
                     ->maxLength(255)
@@ -80,6 +81,7 @@ class LessonResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

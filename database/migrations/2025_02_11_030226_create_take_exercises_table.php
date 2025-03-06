@@ -16,10 +16,19 @@ return new class extends Migration {
             $table->unsignedBigInteger("topic_id");
             $table->unsignedBigInteger("lesson_id");
             $table->unsignedBigInteger("user_id");
-            $table->unsignedBigInteger("take_exercise_answer_id");
-            $table->integer("score");
+            $table->json("answers");
+            $table->integer("total_correct");
+            $table->integer("total_question");
+            $table->float("score");
+            $table->integer("total_exp");
+            $table->integer("total_point");
             $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
+
+            $table->foreign('exercise_id')->references('id')->on('exercises')->onDelete('cascade');
+            $table->foreign('topic_id')->references('id')->on('topics')->onDelete('cascade');
+            $table->foreign('lesson_id')->references('id')->on('lessons')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

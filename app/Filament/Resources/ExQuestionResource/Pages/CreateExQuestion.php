@@ -14,6 +14,11 @@ class CreateExQuestion extends CreateRecord
 {
     protected static string $resource = ExQuestionResource::class;
 
+    protected function getRedirectUrl(): string
+    {
+        return $this->previousUrl ?? $this->getResource()::getUrl('index');
+    }
+
     protected function handleRecordCreation(array $data): ExQuestion
     {
         return DB::transaction(function () use ($data) {
@@ -52,8 +57,8 @@ class CreateExQuestion extends CreateRecord
                     'content' => $data['short_answer'],
                     'is_correct' => true,
                 ]);
-            } elseif ($data['type'] === 'multiple_answer' && isset($data['options'])) {
-                foreach ($data['options'] as $option) {
+            } elseif ($data['type'] === 'multiple_answer' && isset($data['multiple_options'])) {
+                foreach ($data['multiple_options'] as $option) {
                     ExAnswer::create([
                         'ex_question_id' => $question->id,
                         'content' => $option['option'],
@@ -64,5 +69,14 @@ class CreateExQuestion extends CreateRecord
 
             return $question;
         });
+    }
+
+    protected function getFormActions(): array
+    {
+        return [
+            $this->getCreateFormAction(),
+            // ...(static::canCreateAnother() ? [$this->getCreateAnotherFormAction()] : []),
+            $this->getCancelFormAction(),
+        ];
     }
 }

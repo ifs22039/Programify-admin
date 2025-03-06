@@ -35,7 +35,6 @@ class ExquestionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('content')
                     ->label("Question")
                     ->html()
-                    // ->limit(100)
                     ->wrap()
                     ->grow(false)
                     ->tooltip(fn($record) => strip_tags($record->content)),
@@ -52,8 +51,7 @@ class ExquestionsRelationManager extends RelationManager
                     ->html()
                     ->label('Options')
                     ->formatStateUsing(fn($record) => $record->exanswers->pluck('content')
-//                        ->map(fn($content) => '- ' . $content)
-                        ->implode('<br>'))
+                    ->implode('<br>'))
                     ->wrap()
             ])
             ->filters([

@@ -28,12 +28,4 @@ class Lesson extends Model
     {
         return $this->hasMany(Exercise::class);
     }
-
-    protected static function booted()
-    {
-        static::creating(function ($model) {
-            $model->created_by = auth()->id();
-            $model->updated_by = auth()->id();
-        });
-    }
 }
