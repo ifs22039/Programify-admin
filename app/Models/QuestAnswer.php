@@ -20,6 +20,11 @@ class QuestAnswer extends Model
         return $this->belongsTo(Admin::class, "updated_by");
     }
 
+    public function quest(): BelongsTo
+    {
+        return $this->belongsTo(Quest::class);
+    }
+
     protected static function booted()
     {
         static::creating(function ($model) {

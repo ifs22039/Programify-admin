@@ -45,7 +45,8 @@ class QuestResource extends Resource
                         'multiple_choice' => 'Multiple Choice',
                         'true_false' => 'True or False',
                         'essay' => 'Essay',
-                        'short_answer' => 'Short Answers',
+                        'multiple_answer' => 'Multiple Answer of Multiple Choice',
+                        'short_answer' => 'Short Answer',
                     ])
                     ->required()
                     ->reactive()
@@ -60,7 +61,6 @@ class QuestResource extends Resource
                 TextInput::make('exp')
                     ->label('Reward Experience')
                     ->required()
-                    // ->columnSpanFull()
                     ->integer()
                     ->default(0),
 
@@ -70,7 +70,6 @@ class QuestResource extends Resource
                         'Easy' => 'Easy',
                         'Medium' => 'Medium',
                         'Hard' => 'Hard',
-                        'Very Hard' => 'Very Hard',
                     ])
                     ->required()
                     ->reactive()
@@ -91,8 +90,8 @@ class QuestResource extends Resource
                         Forms\Components\RichEditor::make('option')
                             ->label('Option')
                             ->required()
-                            ->maxLength(255)
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->extraInputAttributes(['style' => 'min-height: 5rem !important;']),
                         Forms\Components\Radio::make('is_correct')
                             ->label('Is Correct?')
                             ->default(false)
@@ -102,10 +101,34 @@ class QuestResource extends Resource
                     ->minItems(2)
                     ->grid(2)
                     ->maxItems(4)
+                    ->defaultItems(2)
                     ->columns(2)
                     ->required()
                     ->columnSpanFull()
                     ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_choice'),
+
+                Repeater::make('multiple_options')
+                    ->label('Answer Options')
+                    ->schema([
+                        Forms\Components\RichEditor::make('option')
+                            ->label('Option')
+                            ->required()
+                            ->columnSpanFull()
+                            ->extraInputAttributes(['style' => 'min-height: 5rem !important;']),
+                        Forms\Components\Radio::make('is_correct')
+                            ->label('Is Correct?')
+                            ->default(false)
+                            ->boolean()
+                            ->columnSpanFull(),
+                    ])
+                    ->minItems(2)
+                    ->grid(2)
+                    ->maxItems(6)
+                    ->columns(2)
+                    ->defaultItems(2)
+                    ->required()
+                    ->columnSpanFull()
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'multiple_answer'),
 
                 Radio::make('true_false_answer')
                     ->label('Correct Answer')
@@ -118,10 +141,17 @@ class QuestResource extends Resource
 
                 RichEditor::make('essay_answer')
                     ->required()
-                    ->maxLength(255)
                     ->columnSpanFull()
                     ->required()
                     ->visible(fn(Forms\Get $get) => $get('type') === 'essay'),
+
+                TextInput::make('short_answer')
+                    ->label('Correct Answer')
+                    ->required()
+                    ->columnSpanFull()
+                    ->required()
+                    ->placeholder('Input correct answer here...')
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'short_answer'),
 
                 RichEditor::make('feedback')
                     ->label("Feedback or Explanation")

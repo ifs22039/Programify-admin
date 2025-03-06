@@ -51,12 +51,10 @@ class ExquestionsRelationManager extends RelationManager
                     ->html()
                     ->label('Options')
                     ->formatStateUsing(fn($record) => $record->exanswers->pluck('content')
-                    ->implode('<br>'))
+                        ->implode('<br>'))
                     ->wrap()
             ])
-            ->filters([
-                //
-            ])
+            ->filters([])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
                     ->label("New Question")
@@ -65,7 +63,6 @@ class ExquestionsRelationManager extends RelationManager
                     ->url(fn() => route('filament.admin.resources.ex-questions.create', ['exercise_id' => $this->ownerRecord->id])),
             ])
             ->actions([
-                // Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make()
                     ->label('Edit')
                     ->modal(false)

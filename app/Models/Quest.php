@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Quest extends Model
 {
@@ -18,6 +19,11 @@ class Quest extends Model
     public function updater(): BelongsTo
     {
         return $this->belongsTo(Admin::class, "updated_by");
+    }
+
+    public function questAnswers(): HasMany
+    {
+        return $this->hasMany(QuestAnswer::class);
     }
 
     protected static function booted()
