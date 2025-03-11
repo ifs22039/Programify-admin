@@ -20,6 +20,8 @@ return new class extends Migration {
             $table->integer("total_correct");
             $table->integer("total_question");
             $table->float("score");
+            $table->integer("reward_exp");
+            $table->integer("reward_point");
             $table->integer("total_exp");
             $table->integer("total_point");
             $table->timestamp("deleted_at")->nullable();

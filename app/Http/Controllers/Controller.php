@@ -43,7 +43,5 @@ class Controller extends BaseController
         $print = response()->json([
             'similarity' => $similarityScore . '%',
         ]);
-
-        dd($print);
     }
 }
