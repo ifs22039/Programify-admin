@@ -63,4 +63,5 @@ RUN chown -R www-data:www-data \
 EXPOSE 9000
 
 # Start PHP-FPM
-CMD ["php-fpm"]
+COPY nginx.conf /etc/nginx/http.d/default.conf
+CMD ["/bin/sh", "-c", "php-fpm & nginx -g 'daemon off;'"]
