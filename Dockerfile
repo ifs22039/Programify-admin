@@ -44,6 +44,9 @@ RUN composer install \
     --optimize-autoloader \
     --ignore-platform-req=ext-intl
 
+# Generate Composer autoloader
+RUN composer dump-autoload
+
 # Generate application key
 RUN php artisan key:generate
 
