@@ -58,7 +58,7 @@ class MarketResource extends Resource
                     ->image()
                     ->required()
                     ->directory('market/images')
-                    ->getUploadedFileNameForStorageUsing(fn($file) => Storage::url($file->hashName()))
+                    ->getUploadedFileNameForStorageUsing(fn($file) => $file->hashName())
                     ->columnSpanFull(),
             ]);
     }
