@@ -1,7 +1,7 @@
 # Use PHP 8.3 with FPM on Alpine Linux
 FROM php:8.3-fpm-alpine
 
-# Install system dependencies and PHP extensions
+# Install system dependencies
 RUN apk add --no-cache \
     git \
     curl \
@@ -9,7 +9,8 @@ RUN apk add --no-cache \
     libxml2-dev \
     libzip-dev \
     zip \
-    unzip
+    unzip \
+    icu-dev # Required for intl extension
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -18,7 +19,8 @@ RUN docker-php-ext-install \
     pcntl \
     bcmath \
     gd \
-    zip
+    zip \
+    intl # Added intl extension for Filament
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -26,11 +28,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
+# Add git safe directory configuration
+RUN git config --global --add safe.directory /var/www/html
+
 # Copy application files
 COPY . .
 
-# Install Composer dependencies
-RUN composer install --no-scripts --no-autoloader --optimize-autoloader
+# Set correct permissions before composer install
+RUN chown -R www-data:www-data /var/www/html
+
+# Install Composer dependencies with ignore platform reqs for intl
+RUN composer install \
+    --no-scripts \
+    --no-autoloader \
+    --optimize-autoloader \
+    --ignore-platform-req=ext-intl
 
 # Generate application key
 RUN php artisan key:generate
@@ -38,7 +50,7 @@ RUN php artisan key:generate
 # Create storage link
 RUN php artisan storage:link
 
-# Set permissions
+# Set final permissions
 RUN chown -R www-data:www-data \
     /var/www/html/storage \
     /var/www/html/bootstrap/cache \
