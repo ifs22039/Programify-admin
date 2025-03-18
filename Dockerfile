@@ -10,7 +10,8 @@ RUN apk add --no-cache \
     libzip-dev \
     zip \
     unzip \
-    icu-dev # Required for intl extension
+    icu-dev \
+    nginx # Tambahkan Nginx
 
 # Install PHP extensions
 RUN docker-php-ext-install \
@@ -20,7 +21,7 @@ RUN docker-php-ext-install \
     bcmath \
     gd \
     zip \
-    intl # Added intl extension for Filament
+    intl
 
 # Install Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
@@ -59,9 +60,14 @@ RUN chown -R www-data:www-data \
     /var/www/html/bootstrap/cache \
     /var/www/html/public/storage
 
-# Expose port 9000 for PHP-FPM
+# Copy Nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
+# Modify PHP-FPM configuration to use different port
+RUN sed -i 's/listen = 9000/listen = 9001/g' /usr/local/etc/php-fpm.d/zz-docker.conf
+
+# Expose ports
 EXPOSE 9000
 
-# Start PHP-FPM
-COPY nginx.conf /etc/nginx/http.d/default.conf
+# Start PHP-FPM and Nginx
 CMD ["/bin/sh", "-c", "php-fpm & nginx -g 'daemon off;'"]
