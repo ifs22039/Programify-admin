@@ -17,7 +17,7 @@ class DatabaseSeeder extends Seeder
             AdminTableSeeder::class,
             LevelsTableSeeder::class,
             BadgeSeeder::class,
-            AchievementSeeder::class,
+            // AchievementSeeder::class,
         ]);
     }
 }
