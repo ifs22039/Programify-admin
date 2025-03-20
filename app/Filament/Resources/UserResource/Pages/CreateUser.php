@@ -29,11 +29,11 @@ class CreateUser extends CreateRecord
         return $data;
     }
 
-    protected function afterCreate(User $user): void
+    protected function afterCreate(): void
     {
         HaveAvatar::create([
-            'user_id' => $user->id,
-            'avatar_id' => $user->avatar_id,
+            'user_id' => $this->record->id,
+            'avatar_id' => $this->record->avatar_id,
         ]);
     }
 }
