@@ -15,19 +15,21 @@ class AvatarSeeder extends Seeder
      */
     public function run(): void
     {
-        Avatar::create([
+        $avatar = Avatar::create([
+            "id" => 1,
             "title" => "Male Default",
             "picture" => "",
             "price" => 0,
             "created_by" => 1,
             "updated_by" => 1
         ]);
+
         $users = User::all();
 
         foreach ($users as $user) {
             HaveAvatar::create([
                 "user_id" => $user->id,
-                "avatar_id" => 1,
+                "avatar_id" => $avatar->id,
             ]);
         }
     }
