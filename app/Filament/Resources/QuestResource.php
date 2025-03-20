@@ -7,6 +7,7 @@ use App\Filament\Resources\QuestResource\RelationManagers;
 use App\Models\Quest;
 use App\Utils\MyHelper;
 use Filament\Forms;
+use Filament\Forms\Components\Fieldset;
 use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Radio;
 use Filament\Forms\Components\Repeater;
@@ -63,6 +64,14 @@ class QuestResource extends Resource
                     ->required()
                     ->integer()
                     ->default(0),
+
+                TextInput::make('timer')
+                    ->label('Durasi (Menit)')
+                    ->numeric()
+                    ->minValue(1) // Minimal 1 menit
+                    ->maxValue(1440) // Maksimal 24 jam (opsional)
+                    ->default(1)
+                    ->required(),
 
                 Select::make('difficulty')
                     ->label('Quest Difficulty')

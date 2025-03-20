@@ -38,6 +38,7 @@ class CreateQuest extends CreateRecord
                 'exp' => $data['exp'],
                 'difficulty' => $data['difficulty'],
                 'feedback' => $data['feedback'] ?? null,
+                'timer' => $data['timer']
             ]);
 
             if ($data['type'] === 'multiple_choice' && isset($data['options'])) {

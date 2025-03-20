@@ -33,6 +33,7 @@ class EditQuest extends EditRecord
             $quest->exp = $data['exp'];
             $quest->difficulty = $data['difficulty'];
             $quest->feedback = $data['feedback'] ?? null;
+            $quest->timer = $data["timer"];
 
             $quest->save();
 

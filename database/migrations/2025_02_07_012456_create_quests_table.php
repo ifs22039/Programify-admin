@@ -17,6 +17,7 @@ return new class extends Migration {
             $table->string("type");
             $table->integer("point");
             $table->integer("exp");
+            $table->integer("timer");
             $table->enum('difficulty', ['Easy', 'Medium', 'Hard']);
             $table->longText("feedback")->nullable();
             $table->unsignedBigInteger("created_by");
