@@ -78,7 +78,7 @@ CREATE TABLE `avatars` (
 
 LOCK TABLES `avatars` WRITE;
 /*!40000 ALTER TABLE `avatars` DISABLE KEYS */;
-INSERT INTO `avatars` VALUES (1,'Male Default','avatars/images/gXWMEO8cu645h334rbgcXXc8neIEnD1T1l8YPL0e.svg',0,1,1,NULL,'2025-03-19 13:04:51','2025-03-19 14:09:29'),(2,'Macho Male','avatars/images/97lFbGKgKGTJTPMn448xJ6XFIcnz6HIC39atitjJ.svg',50,1,1,NULL,'2025-03-19 14:10:50','2025-03-19 14:10:50');
+INSERT INTO `avatars` VALUES (1,'Male Default','',0,1,1,NULL,'2025-03-19 13:04:51','2025-03-19 14:09:29'),(2,'Macho Male','avatars/images/97lFbGKgKGTJTPMn448xJ6XFIcnz6HIC39atitjJ.svg',50,1,1,NULL,'2025-03-19 14:10:50','2025-03-19 14:10:50');
 /*!40000 ALTER TABLE `avatars` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -853,21 +853,23 @@ CREATE TABLE `users` (
   `total_point` int NOT NULL DEFAULT '0',
   `total_exp` int NOT NULL DEFAULT '0',
   `level_id` bigint unsigned NOT NULL,
+  `avatar_id` bigint unsigned DEFAULT NULL,
   `created_by` bigint unsigned DEFAULT NULL,
   `updated_by` bigint unsigned DEFAULT NULL,
   `deleted_at` timestamp NULL DEFAULT NULL,
   `remember_token` varchar(100) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
-  `avatar` bigint unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
   KEY `users_created_by_foreign` (`created_by`),
   KEY `users_updated_by_foreign` (`updated_by`),
   KEY `users_level_id_foreign` (`level_id`),
+  KEY `users_avatars_id_foreign` (`avatar_id`),
   CONSTRAINT `users_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `admins` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `users_level_id_foreign` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`) ON DELETE CASCADE,
-  CONSTRAINT `users_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `admins` (`id`) ON DELETE CASCADE
+  CONSTRAINT `users_level_id_foreign` FOREIGN KEY (`level_id`) REFERENCES `levels` (`id`),
+  CONSTRAINT `users_updated_by_foreign` FOREIGN KEY (`updated_by`) REFERENCES `admins` (`id`),
+  CONSTRAINT `users_avatar_id_foreign` FOREIGN KEY (`avatar_id`) REFERENCES `avatars` (`id`),
 ) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
