@@ -22,6 +22,7 @@ class CreateUser extends CreateRecord
         $data["updated_by"] = auth()->id();
         $data["password"] = Hash::make($data["password"]);
         $data["level_id"] = auth()->id();
+        $data["avatar_id"] = 1;
         return $data;
     }
 }
