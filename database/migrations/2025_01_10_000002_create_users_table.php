@@ -22,7 +22,7 @@ return new class extends Migration {
             $table->integer("total_point")->default(0);
             $table->integer("total_exp")->default(0);
             $table->unsignedBigInteger("level_id");
-            $table->unsignedBigInteger("avatar_id")->nullable();
+            $table->unsignedBigInteger("avatar_id")->nullable()->default(1);
             $table->unsignedBigInteger("created_by")->nullable();
             $table->unsignedBigInteger("updated_by")->nullable();
             $table->timestamp("deleted_at")->nullable();
