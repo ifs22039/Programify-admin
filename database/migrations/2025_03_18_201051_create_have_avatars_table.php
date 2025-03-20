@@ -13,7 +13,13 @@ return new class extends Migration
     {
         Schema::create('have_avatars', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("avatar_id");
+            $table->unsignedBigInteger("user_id");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
+
+            $table->foreign('avatar_id')->references('id')->on('avatars')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 
