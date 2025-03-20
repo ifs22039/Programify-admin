@@ -22,15 +22,17 @@ return new class extends Migration {
             $table->integer("total_point")->default(0);
             $table->integer("total_exp")->default(0);
             $table->unsignedBigInteger("level_id");
+            $table->unsignedBigInteger("avatar_id")->nullable();
             $table->unsignedBigInteger("created_by")->nullable();
             $table->unsignedBigInteger("updated_by")->nullable();
             $table->timestamp("deleted_at")->nullable();
             $table->rememberToken();
             $table->timestamps();
 
-            $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
-            $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
-            $table->foreign('level_id')->references('id')->on('levels')->onDelete('cascade');
+            $table->foreign('created_by')->references('id')->on('admins');
+            $table->foreign('updated_by')->references('id')->on('admins');
+            $table->foreign('level_id')->references('id')->on('levels');
+            $table->foreign('avatar_id')->references('id')->on('avatars');
         });
     }
 
