@@ -5,22 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class HaveBadge extends Model
+class HaveAchievement extends Model
 {
     use HasFactory;
 
-    protected $table = 'have_badges';
+    protected $table = 'have_achievements';
 
     protected $fillable = [
-        'badge_id',
+        'achievement_id',
         'user_id',
     ];
 
-    public function badge()
+    public function achievement()
     {
-        return $this->belongsTo(Badge::class, 'badge_id');
+        return $this->belongsTo(Achievement::class, 'achievement_id');
     }
-    
+
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

@@ -5,20 +5,20 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Badge extends Model
+class Achievement extends Model
 {
     use HasFactory;
 
-    protected $table = 'badges';
+    protected $table = 'achievements';
 
     protected $fillable = [
         'title',
-        'description',
         'picture',
+        'description',
     ];
-    
+
     public function users()
     {
-        return $this->belongsToMany(User::class, 'have_badges', 'badge_id', 'user_id')->withTimestamps();
+        return $this->belongsToMany(User::class, 'user_achievements', 'achievement_id', 'user_id')->withTimestamps();
     }
 }
