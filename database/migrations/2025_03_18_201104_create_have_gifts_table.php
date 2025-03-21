@@ -13,7 +13,14 @@ return new class extends Migration
     {
         Schema::create('have_gifts', function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("gift_id");
+            $table->unsignedBigInteger("user_id");
+            $table->boolean("is_active");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
+
+            $table->foreign('gift_id')->references('id')->on('gifts')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

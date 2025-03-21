@@ -2,12 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\MarketResource\Pages;
-use App\Filament\Resources\MarketResource\RelationManagers;
-use App\Models\Market;
+use App\Filament\Resources\GiftResource\Pages;
+use App\Filament\Resources\GiftResource\RelationManagers;
+use App\Models\Gift;
 use Filament\Forms;
 use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -18,20 +17,15 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Facades\Storage;
 
-class MarketResource extends Resource
+class GiftResource extends Resource
 {
-    protected static ?string $model = Market::class;
+    protected static ?string $model = Gift::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-gift';
 
     protected static ?string $navigationGroup = 'E-Learning';
 
     protected static ?int $navigationSort = 6;
-
-    public static function shouldRegisterNavigation(): bool
-    {
-        return false;
-    }
 
     public static function form(Form $form): Form
     {
@@ -40,16 +34,6 @@ class MarketResource extends Resource
                 TextInput::make('title')
                     ->label('Title')
                     ->required()
-                    ->columnSpanFull(),
-
-                Select::make('type')
-                    ->label('Quest Type')
-                    ->options([
-                        'Avatar' => 'Avatar',
-                        'Gift' => 'Gift',
-                    ])
-                    ->required()
-                    ->reactive()
                     ->columnSpanFull(),
 
                 TextInput::make('price')
@@ -62,7 +46,7 @@ class MarketResource extends Resource
                     ->label('Picture')
                     ->image()
                     ->required()
-                    ->directory('market/images')
+                    ->directory('gift/images')
                     ->getUploadedFileNameForStorageUsing(fn($file) => $file->hashName())
                     ->columnSpanFull(),
             ]);
@@ -76,9 +60,6 @@ class MarketResource extends Resource
                     ->label("Title"),
                 Tables\Columns\TextColumn::make('price')
                     ->label("Price"),
-                Tables\Columns\TextColumn::make('type')
-                    ->label("Type")
-                    ->badge(),
                 ImageColumn::make('picture')
                     ->label('Picture')
                     ->size(50)
@@ -97,10 +78,15 @@ class MarketResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\ForceDeleteAction::make(),
+                Tables\Actions\RestoreAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\ForceDeleteBulkAction::make(),
+                    Tables\Actions\RestoreBulkAction::make(),
                 ]),
             ]);
     }
@@ -115,9 +101,14 @@ class MarketResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListMarkets::route('/'),
-            'create' => Pages\CreateMarket::route('/create'),
-            'edit' => Pages\EditMarket::route('/{record}/edit'),
+            'index' => Pages\ListGifts::route('/'),
+            'create' => Pages\CreateGift::route('/create'),
+            'edit' => Pages\EditGift::route('/{record}/edit'),
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->withoutGlobalScopes();
     }
 }

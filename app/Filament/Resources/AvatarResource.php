@@ -22,7 +22,7 @@ class AvatarResource extends Resource
 {
     protected static ?string $model = Avatar::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
+    protected static ?string $navigationIcon = 'heroicon-o-user-circle';
 
     protected static ?string $navigationGroup = 'E-Learning';
 

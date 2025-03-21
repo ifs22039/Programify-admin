@@ -13,7 +13,16 @@ return new class extends Migration
     {
         Schema::create('gifts', function (Blueprint $table) {
             $table->id();
+            $table->string("title");
+            $table->longText("picture");
+            $table->bigInteger("price");
+            $table->unsignedBigInteger("created_by");
+            $table->unsignedBigInteger("updated_by");
+            $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
+
+            $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
+            $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
         });
     }
 
