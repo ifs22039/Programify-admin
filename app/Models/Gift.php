@@ -24,10 +24,10 @@ class Gift extends Model
         return $this->belongsTo(Admin::class, "updated_by");
     }
 
-    protected static function booted()
-    {
-        static::addGlobalScope('notDeleted', function (Builder $builder) {
-            $builder->whereNull('deleted_at');
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::addGlobalScope('notDeleted', function (Builder $builder) {
+    //         $builder->whereNull('deleted_at');
+    //     });
+    // }
 }
