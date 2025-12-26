@@ -11,16 +11,18 @@ use Filament\Widgets\StatsOverviewWidget\Stat;
 
 class ProgamifyStats extends BaseWidget
 {
+    protected static ?int $sort = 1;
+
     protected function getStats(): array
     {
         return [
-            $this->getStatWithTrend(User::class, 'Users'),
-            $this->getStatWithTrend(Admin::class, 'Admins'),
-            $this->getStatWithTrend(Topic::class, 'Topics'),
+            $this->getStatWithTrend(User::class, 'Users', 'heroicon-o-users'),
+            $this->getStatWithTrend(Admin::class, 'Admins', 'heroicon-o-shield-check'),
+            $this->getStatWithTrend(Topic::class, 'Topics', 'heroicon-o-book-open'),
         ];
     }
 
-    private function getStatWithTrend($model, $label)
+    private function getStatWithTrend($model, $label, $icon)
     {
         $totalCount = $model::count();
 
@@ -41,6 +43,7 @@ class ProgamifyStats extends BaseWidget
         return Stat::make($label, $totalCount)
             ->description(($percentageChange >= 0 ? '+' : '') . "{$percentageChange}% last 7 days")
             ->color($percentageChange >= 0 ? 'success' : 'danger')
+            ->icon($icon)
             ->chart($trends); 
     }
 }

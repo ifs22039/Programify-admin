@@ -73,6 +73,16 @@ class ExQuestionResource extends Resource
                     ->integer()
                     ->default(0),
 
+                Select::make('difficulty')
+                    ->label('Difficulty Level')
+                    ->options([
+                        'easy' => 'Easy',
+                        'medium' => 'Medium',
+                        'hard' => 'Hard',
+                    ])
+                    ->default('easy')
+                    ->required(),
+
                 RichEditor::make('content')
                     ->required()
                     ->label("Question")

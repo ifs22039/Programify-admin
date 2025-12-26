@@ -28,6 +28,7 @@ class CreateExQuestion extends CreateRecord
                 'content' => $data['content'],
                 'point' => $data['point'],
                 'exp' => $data['exp'],
+                'difficulty' => $data['difficulty'],
                 'feedback' => $data['feedback'] ?? null,
             ]);
 

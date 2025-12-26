@@ -8,6 +8,8 @@ use Carbon\Carbon;
 
 class UserDailyRegistrationChart extends ChartWidget
 {
+    protected static ?int $sort = 3;
+
     protected static ?string $heading = 'Daily Registration';
 
     protected function getData(): array

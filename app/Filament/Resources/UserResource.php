@@ -91,12 +91,18 @@ class UserResource extends Resource
                 //                    ->formatStateUsing(fn() => "System")
                 //                    ->html(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->formatStateUsing(fn($record) => ($record->created_by ? $record->creator->name : "System") . "<br/> <hr/>" . $record->created_at)
-                    ->label("Created By")
+                    ->formatStateUsing(fn($record) =>
+                        (($record->created_by && $record->creator) ? $record->creator->name : 'System')
+                        . "<br/> <hr/>" . $record->created_at
+                    )
+                    ->label('Created By')
                     ->html(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->label("Updated By")
-                    ->formatStateUsing(fn($record) => ($record->updated_by ? $record->updater->name : "System") . "<br/> <hr/>" . $record->created_at)
+                    ->label('Updated By')
+                    ->formatStateUsing(fn($record) =>
+                        (($record->updated_by && $record->updater) ? $record->updater->name : 'System')
+                        . "<br/> <hr/>" . $record->updated_at
+                    )
                     ->html()
             ])
             ->filters([

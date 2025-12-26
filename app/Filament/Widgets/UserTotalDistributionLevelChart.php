@@ -7,6 +7,8 @@ use Filament\Widgets\ChartWidget;
 
 class UserTotalDistributionLevelChart extends ChartWidget
 {
+    protected static ?int $sort = 7;
+
     protected static ?string $heading = 'User Level Distribution';
 
     protected function getData(): array

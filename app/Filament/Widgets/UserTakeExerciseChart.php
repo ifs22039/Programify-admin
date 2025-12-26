@@ -7,6 +7,8 @@ use Filament\Widgets\ChartWidget;
 
 class UserTakeExerciseChart extends ChartWidget
 {
+    protected static ?int $sort = 6;
+
     protected static ?string $heading = 'Users Take Exercise';
 
     protected function getData(): array

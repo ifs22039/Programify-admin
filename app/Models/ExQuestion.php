@@ -12,12 +12,16 @@ class ExQuestion extends Model
     use HasFactory;
 
     protected $fillable = [
-        "content",
-        "type",
-        "exercise_id",
-        "created_by",
-        "updated_by"
-    ];
+    "content",
+    "type",
+    "exercise_id",
+    "point",
+    "exp",
+    "difficulty",
+    "created_by",
+    "updated_by"
+];
+
 
     public function exercise(): BelongsTo
     {

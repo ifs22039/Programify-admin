@@ -17,15 +17,12 @@ return new class extends Migration {
             $table->unsignedBigInteger("exercise_id");
             $table->integer("point");
             $table->integer("exp");
+            $table->enum('difficulty', ['easy', 'medium', 'hard'])->default('easy');
             $table->longText("feedback")->nullable();
             $table->unsignedBigInteger("created_by");
             $table->unsignedBigInteger("updated_by");
             $table->timestamp("deleted_at")->nullable();
             $table->timestamps();
-
-            $table->foreign('exercise_id')->references('id')->on('exercises')->onDelete('cascade');
-            $table->foreign('created_by')->references('id')->on('admins')->onDelete('cascade');
-            $table->foreign('updated_by')->references('id')->on('admins')->onDelete('cascade');
         });
     }
 

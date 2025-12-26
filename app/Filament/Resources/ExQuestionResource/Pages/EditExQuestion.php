@@ -31,6 +31,7 @@ class EditExQuestion extends EditRecord
             $question->content = $data['content'];
             $question->point = $data['point'];
             $question->exp = $data['exp'];
+            $question->difficulty = $data['difficulty'];
             $question->feedback = $data['feedback'] ?? null;
 
             $question->save();
