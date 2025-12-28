@@ -3,28 +3,21 @@
 namespace App\Filament\Resources\ExerciseResource\RelationManagers;
 
 use Filament\Forms;
-use Filament\Forms\Components\Radio;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Form;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Filament\Notifications\Notification;
 use App\Utils\MyHelper;
 
 class ExquestionsRelationManager extends RelationManager
 {
     protected static string $relationship = 'exquestions';
-
     protected static ?string $title = 'Questions';
 
     public function form(Form $form): Form
     {
-        return $form
-            ->schema([]);
+        return $form->schema([]);
     }
 
     public function table(Table $table): Table
@@ -33,67 +26,74 @@ class ExquestionsRelationManager extends RelationManager
             ->recordTitleAttribute('content')
             ->columns([
                 Tables\Columns\TextColumn::make('content')
-                    ->label("Question")
+                    ->label('Question')
                     ->html()
-                    ->wrap()
-                    ->grow(false)
-                    ->tooltip(fn($record) => strip_tags($record->content)),
+                    ->wrap(),
+
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
-                    ->formatStateUsing(fn($state) => MyHelper::questionType($state)),
+                    ->formatStateUsing(fn ($state) => MyHelper::questionType($state)),
+
                 Tables\Columns\TextColumn::make('point')
                     ->label('Reward')
-                    ->badge()
-                    ->formatStateUsing(fn($record) => $record->point . " Point <br/> <hr/>" . $record->exp . " Exp")
-                    ->html(),
-                Tables\Columns\TextColumn::make('exanswers.content')
                     ->html()
-                    ->label('Options')
-                    ->formatStateUsing(fn($record) => $record->exanswers->pluck('content')
-                        ->implode('<br>'))
+                    ->badge()
+                    ->formatStateUsing(
+                        fn ($record) => "{$record->point} Point <br/><hr/>{$record->exp} Exp"
+                    ),
+
+                Tables\Columns\TextColumn::make('exanswers.content')
+                    ->label('Answer / Options')
+                    ->html()
                     ->wrap()
+                    ->formatStateUsing(
+                        fn ($record) => $record->exanswers->pluck('content')->implode('<br>')
+                    ),
             ])
-            ->filters([])
             ->headerActions([
                 Tables\Actions\CreateAction::make()
-                    ->label("New Question")
-                    ->modalHeading("New Question")
+                    ->label('New Question')
                     ->modal(false)
-                    ->url(fn() => route('filament.admin.resources.ex-questions.create', ['exercise_id' => $this->ownerRecord->id])),
+                    ->url(fn () => route(
+                        'filament.admin.resources.ex-questions.create',
+                        ['exercise_id' => $this->ownerRecord->id]
+                    )),
+
                 Tables\Actions\Action::make('generate_from_pdf')
                     ->label('Generate from PDF')
                     ->icon('heroicon-o-document-arrow-up')
                     ->form([
-                        Forms\Components\TextInput::make('topic_name')
-                            ->label('Name')
-                            ->placeholder('Enter topic name')
-                            ->required(),
-                        Forms\Components\Textarea::make('prompt')
-                            ->label('Prompt for Question Generation')
-                            ->placeholder('e.g., Generate 10 multiple choice questions about the main concepts in this document')
-                            ->helperText('Describe how you want the questions to be generated from the PDF')
-                            ->rows(3),
-                        Forms\Components\FileUpload::make('pdf_file')
-                            ->label('Upload File')
-                            ->acceptedFileTypes(['application/pdf'])
+                        Forms\Components\Textarea::make('instructions')
+                            ->label('Instruksi')
+                            ->placeholder('Contoh: Buatkan soal pilihan ganda tentang pemrograman beserta jawabannya')
                             ->required()
+                            ->rows(3),
+
+                        Forms\Components\TextInput::make('jumlah_soal')
+                            ->numeric()
+                            ->minValue(1)
+                            ->default(5)
+                            ->required(),
+
+                        Forms\Components\FileUpload::make('pdf_file')
+                            ->label('Upload PDF')
+                            ->acceptedFileTypes(['application/pdf'])
                             ->disk('public')
-                            ->helperText('PDF only (max. 10MB). Upload a PDF document to generate questions automatically based on your prompt')
-                            ->columnSpanFull(),
-                        
+                            ->required(),
+
                         Forms\Components\Section::make('Configuration')
                             ->schema([
                                 Forms\Components\TextInput::make('default_point')
-                                    ->label('Default Points')
                                     ->numeric()
                                     ->default(10)
                                     ->required(),
+
                                 Forms\Components\TextInput::make('default_exp')
-                                    ->label('Default EXP')
                                     ->numeric()
                                     ->default(10)
                                     ->required(),
+
                                 Forms\Components\Select::make('difficulty')
                                     ->options([
                                         'easy' => 'Easy',
@@ -102,82 +102,115 @@ class ExquestionsRelationManager extends RelationManager
                                     ])
                                     ->default('medium')
                                     ->required(),
-                            ])->columns(3)->collapsed(),
+                            ])
+                            ->columns(3)
+                            ->collapsed(),
                     ])
                     ->action(function (array $data, $livewire) {
                         $service = new \App\Services\QuestionGeneratorService();
 
                         try {
-                            // 1. Upload PDF and get text
-                            $uploadResult = $service->uploadPdf($data['pdf_file']);
-                            $text = $uploadResult['text'];
-                            $sourceId = $uploadResult['source_id'];
+                            /** -----------------------------
+                             * 1. FIX PATH FILE FILAMENT
+                             * ----------------------------- */
+                            $pdfPath = is_array($data['pdf_file'])
+                                ? $data['pdf_file'][0]
+                                : $data['pdf_file'];
 
-                            // 2. Generate Questions
-                            $prompt = $data['prompt'] ?? null;
-                            $questionsData = $service->generateQuestions($text, $sourceId, 5, $prompt);
+                            $absolutePdfPath = storage_path('app/public/' . $pdfPath);
 
+                            /** -----------------------------
+                             * 2. UPLOAD PDF & EXTRACT TEXT
+                             * ----------------------------- */
+                            $uploadResult = $service->uploadPdf($absolutePdfPath);
+
+                            if (empty(trim($uploadResult['text']))) {
+                                throw new \Exception('Gagal mengekstrak teks dari PDF.');
+                            }
+
+                            /** -----------------------------
+                             * 3. GENERATE QUESTIONS
+                             * ----------------------------- */
+                            $questionsData = $service->generateQuestions(
+                                text: $uploadResult['text'],
+                                sourceId: $uploadResult['source_id'],
+                                instructions: $data['instructions'],
+                                jumlahSoal: (int) $data['jumlah_soal']
+                            );
+
+                            if (empty($questionsData)) {
+                                throw new \Exception('API tidak menghasilkan soal.');
+                            }
+
+                            /** -----------------------------
+                             * 4. SAVE TO DATABASE
+                             * ----------------------------- */
                             $exerciseId = $livewire->ownerRecord->id;
                             $count = 0;
 
                             foreach ($questionsData as $qData) {
-                                // Create Question
+
+                                // DETECT TYPE
+                                // Prioritize explicit type from API, fallback to heuristic
+                                $type = $qData['type'] ?? (isset($qData['options']) ? 'multiple_choice' : 'essay');
+
                                 $question = \App\Models\ExQuestion::create([
-                                    'content' => $qData['question'] ?? 'Generated Question',
-                                    'type' => 'multiple_choice',
+                                    'content'     => $qData['question'],
+                                    'type'        => $type,
                                     'exercise_id' => $exerciseId,
-                                    'point' => $data['default_point'],
-                                    'exp' => $data['default_exp'],
-                                    'difficulty' => $data['difficulty'],
+                                    'point'       => $data['default_point'],
+                                    'exp'         => $data['default_exp'],
+                                    'difficulty'  => $data['difficulty'],
                                 ]);
 
-                                // Create Answers
-                                if (isset($qData['options']) && is_array($qData['options'])) {
-                                    $correctAnswerRaw = $qData['answer'] ?? null;
-                                    
-                                    foreach ($qData['options'] as $index => $optionText) {
-                                        $isCorrect = false;
-                                        
-                                        // Logic to determine if this option is the correct answer
-                                        // 1. Exact match
-                                        if ($correctAnswerRaw === $optionText) {
-                                            $isCorrect = true;
-                                        } 
-                                        // 2. Index match (if answer is 0, 1, 2...)
-                                        elseif (is_numeric($correctAnswerRaw) && (int)$correctAnswerRaw === $index) {
-                                            $isCorrect = true;
-                                        }
-                                        // 3. Letter match (A, B, C, D)
-                                        elseif (is_string($correctAnswerRaw)) {
-                                            $letter = strtoupper(trim($correctAnswerRaw));
-                                            $optionLetter = chr(65 + $index); // 0->A, 1->B, ...
-                                            if ($letter === $optionLetter) {
-                                                $isCorrect = true;
-                                            }
-                                            // Handle case where answer is "Option A" or similar
-                                            elseif (str_contains($letter, "OPTION $optionLetter")) {
-                                                $isCorrect = true;
-                                            }
-                                        }
+                                // MULTIPLE CHOICE
+                                if ($type === 'multiple_choice' && isset($qData['options']) && is_array($qData['options'])) {
+                                    foreach ($qData['options'] as $index => $option) {
+                                        $letter = chr(65 + $index); // A, B, C...
+                                        // Check if answer matches letter (A, B) or full content
+                                        $answerRaw = $qData['answer'] ?? '';
+                                        $isCorrect = (strtoupper($answerRaw) === $letter) || ($answerRaw == $option);
 
                                         \App\Models\ExAnswer::create([
-                                            'content' => $optionText,
+                                            'content' => $option,
                                             'is_correct' => $isCorrect,
                                             'ex_question_id' => $question->id,
                                         ]);
                                     }
                                 }
+                                // NON-MULTIPLE CHOICE (Essay, Short Answer, True False)
+                                else {
+                                    $answerContent = $qData['answer_key'] ?? $qData['answer'] ?? null;
+
+                                    if ($answerContent !== null) {
+                                        // Normalize True/False
+                                        if ($type === 'true_false') {
+                                            if (is_bool($answerContent)) {
+                                                $answerContent = $answerContent ? 'true' : 'false';
+                                            } else {
+                                                $answerContent = strtolower((string)$answerContent);
+                                            }
+                                        }
+
+                                        \App\Models\ExAnswer::create([
+                                            'content' => $answerContent,
+                                            'is_correct' => true,
+                                            'ex_question_id' => $question->id,
+                                        ]);
+                                    }
+                                }
+
                                 $count++;
                             }
 
-                            \Filament\Notifications\Notification::make()
+                            Notification::make()
                                 ->title("Successfully generated {$count} questions")
                                 ->success()
                                 ->send();
 
                         } catch (\Exception $e) {
-                            \Filament\Notifications\Notification::make()
-                                ->title('An error occurred')
+                            Notification::make()
+                                ->title('Generate Failed')
                                 ->body($e->getMessage())
                                 ->danger()
                                 ->send();
@@ -186,15 +219,9 @@ class ExquestionsRelationManager extends RelationManager
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                    ->label('Edit')
                     ->modal(false)
-                    ->url(fn($record) => route('filament.admin.resources.ex-questions.edit', $record)),
+                    ->url(fn ($record) => route('filament.admin.resources.ex-questions.edit', ['record' => $record])),
                 Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
             ]);
     }
 }

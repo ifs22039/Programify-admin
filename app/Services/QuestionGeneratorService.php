@@ -62,20 +62,24 @@ class QuestionGeneratorService
      * @return array List of questions
      * @throws Exception
      */
-    public function generateQuestions(string $text, ?int $sourceId = null, int $numQuestions = 5, ?string $prompt = null): array
-    {
-        $response = Http::post("{$this->baseUrl}/generate/", [
-            'text' => $text,
-            'source_id' => $sourceId,
-            'num_questions' => $numQuestions,
-            'prompt' => $prompt,
-        ]);
+    public function generateQuestions(
+    string $text,
+    ?int $sourceId,
+    string $instructions,
+    int $jumlahSoal
+): array {
+    $response = Http::post("{$this->baseUrl}/generate/", [
+        'source_id'    => $sourceId,
+        'text'         => $text,
+        'instructions' => $instructions,
+        'jumlah_soal'  => $jumlahSoal,
+    ]);
 
-        if (!$response->successful()) {
-            throw new Exception("Error generating questions: " . $response->body());
-        }
-
-        $data = $response->json();
-        return $data['data'] ?? [];
+    if (!$response->successful()) {
+        throw new Exception("Error generating questions: " . $response->body());
     }
+
+    return $response->json()['preview'] ?? [];
+}
+
 }
