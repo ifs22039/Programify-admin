@@ -28,7 +28,27 @@ class ExquestionsRelationManager extends RelationManager
                 Tables\Columns\TextColumn::make('content')
                     ->label('Question')
                     ->html()
-                    ->wrap(),
+                    ->wrap()
+                    ->formatStateUsing(
+                        function ($record) {
+                            if ($record->type === 'matching') {
+                                $pairs = json_decode($record->content, true);
+                                if (is_array($pairs) && count($pairs) > 0) {
+                                    $explanations = [];
+                                    foreach ($pairs as $pair) {
+                                        if (isset($pair['explanation'])) {
+                                            // Remove HTML tags from explanation
+                                            $text = strip_tags($pair['explanation']);
+                                            $explanations[] = $text;
+                                        }
+                                    }
+                                    return !empty($explanations) ? implode('<br>', $explanations) : 'No explanations';
+                                }
+                                return 'No explanations';
+                            }
+                            return $record->content;
+                        }
+                    ),
 
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
@@ -48,7 +68,22 @@ class ExquestionsRelationManager extends RelationManager
                     ->html()
                     ->wrap()
                     ->formatStateUsing(
-                        fn ($record) => $record->exanswers->pluck('content')->implode('<br>')
+                        function ($record) {
+                            if ($record->type === 'matching') {
+                                $pairs = json_decode($record->content, true);
+                                if (is_array($pairs) && count($pairs) > 0) {
+                                    $keywords = [];
+                                    foreach ($pairs as $pair) {
+                                        if (isset($pair['keyword'])) {
+                                            $keywords[] = $pair['keyword'];
+                                        }
+                                    }
+                                    return !empty($keywords) ? implode('<br>', $keywords) : 'No keywords';
+                                }
+                                return 'No keywords';
+                            }
+                            return $record->exanswers->pluck('content')->implode('<br>');
+                        }
                     ),
             ])
             ->headerActions([
@@ -163,8 +198,12 @@ class ExquestionsRelationManager extends RelationManager
                                     'difficulty'  => $data['difficulty'],
                                 ]);
 
+                                // MATCHING
+                                if ($type === 'matching' && isset($qData['pairs']) && is_array($qData['pairs'])) {
+                                    $question->update(['content' => json_encode($qData['pairs'])]);
+                                }
                                 // MULTIPLE CHOICE
-                                if ($type === 'multiple_choice' && isset($qData['options']) && is_array($qData['options'])) {
+                                elseif ($type === 'multiple_choice' && isset($qData['options']) && is_array($qData['options'])) {
                                     foreach ($qData['options'] as $index => $option) {
                                         $letter = chr(65 + $index); // A, B, C...
                                         // Check if answer matches letter (A, B) or full content

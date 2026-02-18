@@ -28,7 +28,7 @@ class EditExQuestion extends EditRecord
 
             $question->exercise_id = $data['exercise_id'];
             $question->type = $data['type'];
-            $question->content = $data['content'];
+            $question->content = $data['type'] === 'matching' ? json_encode($data['matching_pairs']) : $data['content'];
             $question->point = $data['point'];
             $question->exp = $data['exp'];
             $question->difficulty = $data['difficulty'];
@@ -72,6 +72,14 @@ class EditExQuestion extends EditRecord
                         'is_correct' => $option['is_correct'] ?? false,
                     ]);
                 }
+            } elseif ($data['type'] === 'matching' && isset($data['matching_pairs'])) {
+                foreach ($data['matching_pairs'] as $pair) {
+                    ExAnswer::create([
+                        'ex_question_id' => $question->id,
+                        'content' => json_encode($pair),
+                        'is_correct' => true,
+                    ]);
+                }
             }
 
             return $question;
@@ -112,6 +120,9 @@ class EditExQuestion extends EditRecord
             $answer = $record->exanswers[0]->content;
 
             $data["short_answer"] = $answer;
+        } else if ($record->type == "matching") {
+            $pairs = json_decode($record->content, true);
+            $data["matching_pairs"] = $pairs;
         }
 
         return $data;

@@ -8,7 +8,7 @@ use Exception;
 
 class QuestionGeneratorService
 {
-    protected string $baseUrl = 'https://ta-14-production.up.railway.app/api';
+    protected string $baseUrl = 'http://127.0.0.1:8000/api';
 
     /**
      * Upload a PDF file to the Python API and extract text.

@@ -53,6 +53,7 @@ class ExQuestionResource extends Resource
                         'essay' => 'Essay',
                         'multiple_answer' => 'Multiple Answer of Multiple Choice',
                         'short_answer' => 'Short Answer',
+                        'matching' => 'Matching',
                     ])
                     ->required()
                     ->reactive()
@@ -91,7 +92,8 @@ class ExQuestionResource extends Resource
                     ->fileAttachmentsVisibility('public')
                     ->columnSpanFull()
                     ->placeholder('Input content of the question here...')
-                    ->extraAttributes(['class' => 'h-96']),
+                    ->extraAttributes(['class' => 'h-96'])
+                    ->visible(fn(Forms\Get $get) => $get('type') !== 'matching'),
 
                 Repeater::make('options')
                     ->label('Answer Options')
@@ -161,6 +163,26 @@ class ExQuestionResource extends Resource
                     ->required()
                     ->placeholder('Input correct answer here...')
                     ->visible(fn(Forms\Get $get) => $get('type') === 'short_answer'),
+
+                Repeater::make('matching_pairs')
+                    ->label('Matching Pairs')
+                    ->schema([
+                        TextInput::make('keyword')
+                            ->label('Keyword')
+                            ->required()
+                            ->placeholder('Enter keyword'),
+                        RichEditor::make('explanation')
+                            ->label('Explanation')
+                            ->required()
+                            ->placeholder('Enter explanation')
+                            ->extraInputAttributes(['style' => 'min-height: 5rem !important;']),
+                    ])
+                    ->minItems(2)
+                    ->columns(2)
+                    ->defaultItems(2)
+                    ->required()
+                    ->columnSpanFull()
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'matching'),
 
                 RichEditor::make('feedback')
                     ->label("Feedback or Explanation")

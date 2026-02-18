@@ -22,10 +22,12 @@ class CreateExQuestion extends CreateRecord
     protected function handleRecordCreation(array $data): ExQuestion
     {
         return DB::transaction(function () use ($data) {
+            $content = $data['type'] === 'matching' ? json_encode($data['matching_pairs']) : $data['content'];
+
             $question = ExQuestion::create([
                 'exercise_id' => $data['exercise_id'],
                 'type' => $data['type'],
-                'content' => $data['content'],
+                'content' => $content,
                 'point' => $data['point'],
                 'exp' => $data['exp'],
                 'difficulty' => $data['difficulty'],
@@ -64,6 +66,14 @@ class CreateExQuestion extends CreateRecord
                         'ex_question_id' => $question->id,
                         'content' => $option['option'],
                         'is_correct' => $option['is_correct'] ?? false,
+                    ]);
+                }
+            } elseif ($data['type'] === 'matching' && isset($data['matching_pairs'])) {
+                foreach ($data['matching_pairs'] as $pair) {
+                    ExAnswer::create([
+                        'ex_question_id' => $question->id,
+                        'content' => json_encode($pair),
+                        'is_correct' => true,
                     ]);
                 }
             }

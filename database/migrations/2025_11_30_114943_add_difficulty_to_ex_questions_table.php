@@ -9,14 +9,14 @@ return new class extends Migration
     /**
      * Run the migrations.
      */
-    public function up(): void
+public function up()
 {
     Schema::table('ex_questions', function (Blueprint $table) {
-        $table->enum('difficulty', ['easy', 'medium', 'hard'])->default('easy')->after('exp');
+        $table->string('difficulty')->after('exp');
     });
 }
 
-public function down(): void
+public function down()
 {
     Schema::table('ex_questions', function (Blueprint $table) {
         $table->dropColumn('difficulty');

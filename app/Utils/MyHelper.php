@@ -16,6 +16,8 @@ class MyHelper
             return "Short Answer";
         } else if ($text === "multiple_answer") {
             return "Multiple Answer";
+        } else if ($text === "matching") {
+            return "Matching";
         }
 
         return "-";
