@@ -29,6 +29,11 @@ class EditExQuestion extends EditRecord
             $question->exercise_id = $data['exercise_id'];
             $question->type = $data['type'];
             $question->content = $data['type'] === 'matching' ? json_encode($data['matching_pairs']) : $data['content'];
+
+            if (in_array($data['type'], ['essay', 'short_answer'])) {
+                $question->content = trim(strip_tags($question->content));
+            }
+
             $question->point = $data['point'];
             $question->exp = $data['exp'];
             $question->difficulty = $data['difficulty'];
@@ -55,13 +60,13 @@ class EditExQuestion extends EditRecord
             } elseif ($data['type'] === 'essay') {
                 ExAnswer::create([
                     'ex_question_id' => $question->id,
-                    'content' => $data['essay_answer'],
+                    'content' => trim(strip_tags($data['essay_answer'])),
                     'is_correct' => false,
                 ]);
             } elseif ($data['type'] === 'short_answer') {
                 ExAnswer::create([
                     'ex_question_id' => $question->id,
-                    'content' => $data['short_answer'],
+                    'content' => trim(strip_tags($data['short_answer'])),
                     'is_correct' => true,
                 ]);
             } elseif ($data['type'] === 'multiple_answer' && isset($data['multiple_options'])) {

@@ -24,6 +24,11 @@ class CreateExQuestion extends CreateRecord
         return DB::transaction(function () use ($data) {
             $content = $data['type'] === 'matching' ? json_encode($data['matching_pairs']) : $data['content'];
 
+            // strip <p> tags (and other HTML) for essay/short answer types
+            if (in_array($data['type'], ['essay', 'short_answer'])) {
+                $content = trim(strip_tags($content));
+            }
+
             $question = ExQuestion::create([
                 'exercise_id' => $data['exercise_id'],
                 'type' => $data['type'],
@@ -51,13 +56,13 @@ class CreateExQuestion extends CreateRecord
             } elseif ($data['type'] === 'essay') {
                 ExAnswer::create([
                     'ex_question_id' => $question->id,
-                    'content' => $data['essay_answer'],
-                    'is_correct' => false,
+                    'content' => trim(strip_tags($data['essay_answer'])),
+                    'is_correct' => true,
                 ]);
             } elseif ($data['type'] === 'short_answer') {
                 ExAnswer::create([
                     'ex_question_id' => $question->id,
-                    'content' => $data['short_answer'],
+                    'content' => trim(strip_tags($data['short_answer'])),
                     'is_correct' => true,
                 ]);
             } elseif ($data['type'] === 'multiple_answer' && isset($data['multiple_options'])) {
