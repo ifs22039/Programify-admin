@@ -26,9 +26,11 @@ class EditQuest extends EditRecord
         return DB::transaction(function () use ($data) {
             $quest = $this->record;
 
+            $content = $data['type'] === 'matching' ? json_encode($data['matching_pairs']) : $data['content'];
+
             $quest->title = $data['title'];
             $quest->type = $data['type'];
-            $quest->content = $data['content'];
+            $quest->content = $content;
             $quest->point = $data['point'];
             $quest->exp = $data['exp'];
             $quest->difficulty = $data['difficulty'];
@@ -73,6 +75,14 @@ class EditQuest extends EditRecord
                         'is_correct' => $option['is_correct'] ?? false,
                     ]);
                 }
+            } elseif ($data['type'] === 'matching' && isset($data['matching_pairs'])) {
+                foreach ($data['matching_pairs'] as $pair) {
+                    QuestAnswer::create([
+                        'quest_id' => $quest->id,
+                        'content' => json_encode($pair),
+                        'is_correct' => true,
+                    ]);
+                }
             }
 
             return $quest;
@@ -113,6 +123,9 @@ class EditQuest extends EditRecord
             $answer = $record->questAnswers[0]->content;
 
             $data["short_answer"] = $answer;
+        } else if ($record->type == "matching") {
+            $pairs = json_decode($record->content, true);
+            $data["matching_pairs"] = $pairs;
         }
 
         return $data;

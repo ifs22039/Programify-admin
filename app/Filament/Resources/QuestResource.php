@@ -49,6 +49,7 @@ class QuestResource extends Resource
                         'essay' => 'Essay',
                         'multiple_answer' => 'Multiple Answer of Multiple Choice',
                         'short_answer' => 'Short Answer',
+                        'matching' => 'Matching',
                     ])
                     ->required()
                     ->reactive()
@@ -163,6 +164,26 @@ class QuestResource extends Resource
                     ->placeholder('Input correct answer here...')
                     ->visible(fn(Forms\Get $get) => $get('type') === 'short_answer'),
 
+                Repeater::make('matching_pairs')
+                    ->label('Matching Pairs')
+                    ->schema([
+                        TextInput::make('keyword')
+                            ->label('Keyword')
+                            ->required()
+                            ->placeholder('Enter keyword'),
+                        RichEditor::make('explanation')
+                            ->label('Explanation')
+                            ->required()
+                            ->placeholder('Enter explanation')
+                            ->extraInputAttributes(['style' => 'min-height: 5rem !important;']),
+                    ])
+                    ->minItems(2)
+                    ->columns(2)
+                    ->defaultItems(2)
+                    ->required()
+                    ->columnSpanFull()
+                    ->visible(fn(Forms\Get $get) => $get('type') === 'matching'),
+
                 RichEditor::make('feedback')
                     ->label("Feedback or Explanation")
                     ->placeholder("Input feedback or explanation of the right answer here...")
@@ -180,6 +201,30 @@ class QuestResource extends Resource
             ->columns([
                 Tables\Columns\TextColumn::make('title')
                     ->label("Title"),
+                // Tables\Columns\TextColumn::make('content')
+                //     ->label('Question')
+                //     ->html()
+                //     ->wrap()
+                //     ->formatStateUsing(
+                //         function ($record) {
+                //             if ($record->type === 'matching') {
+                //                 $pairs = json_decode($record->content, true);
+                //                 if (is_array($pairs) && count($pairs) > 0) {
+                //                     $explanations = [];
+                //                     foreach ($pairs as $pair) {
+                //                         if (isset($pair['explanation'])) {
+                //                             // Remove HTML tags from explanation
+                //                             $text = strip_tags($pair['explanation']);
+                //                             $explanations[] = $text;
+                //                         }
+                //                     }
+                //                     return !empty($explanations) ? implode('<br>', $explanations) : 'No explanations';
+                //                 }
+                //                 return 'No explanations';
+                //             }
+                //             return $record->content;
+                //         }
+                //     ),
                 Tables\Columns\TextColumn::make('type')
                     ->label('Type')
                     ->badge()
@@ -315,10 +360,9 @@ class QuestResource extends Resource
                                     'feedback' => $qData['explanation'] ?? null,
                                 ]);
 
-                                // MATCHING - but Quest doesn't support matching, skip or convert
+                                // MATCHING
                                 if ($type === 'matching' && isset($qData['pairs']) && is_array($qData['pairs'])) {
-                                    // Skip matching for Quest, or convert to essay
-                                    continue;
+                                    $quest->update(['content' => json_encode($qData['pairs'])]);
                                 }
                                 // MULTIPLE CHOICE
                                 elseif ($type === 'multiple_choice' && isset($qData['options']) && is_array($qData['options'])) {

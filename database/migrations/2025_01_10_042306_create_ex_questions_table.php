@@ -17,7 +17,6 @@ return new class extends Migration {
             $table->unsignedBigInteger("exercise_id");
             $table->integer("point");
             $table->integer("exp");
-            $table->enum('difficulty', ['easy', 'medium', 'hard'])->default('easy');
             $table->longText("feedback")->nullable();
             $table->unsignedBigInteger("created_by");
             $table->unsignedBigInteger("updated_by");
