@@ -11,6 +11,19 @@ class Quest extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'title',
+        'content',
+        'type',
+        'point',
+        'exp',
+        'timer',
+        'difficulty',
+        'feedback',
+        'created_by',
+        'updated_by',
+    ];
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(Admin::class, "created_by");

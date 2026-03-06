@@ -10,6 +10,14 @@ class QuestAnswer extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'content',
+        'is_correct',
+        'quest_id',
+        'created_by',
+        'updated_by',
+    ];
+
     public function creator(): BelongsTo
     {
         return $this->belongsTo(Admin::class, "created_by");

@@ -15,6 +15,7 @@ use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Notifications\Notification;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -202,6 +203,176 @@ class QuestResource extends Resource
             ])
             ->filters([
                 //
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('generate_from_pdf')
+                    ->label('Generate from PDF')
+                    ->icon('heroicon-o-document-arrow-up')
+                    ->form([
+                        Forms\Components\Textarea::make('instructions')
+                            ->label('Instruksi')
+                            ->placeholder('Contoh: Buatkan soal pilihan ganda tentang pemrograman beserta jawabannya')
+                            ->required()
+                            ->rows(3),
+
+                        Forms\Components\TextInput::make('jumlah_soal')
+                            ->numeric()
+                            ->minValue(1)
+                            ->default(5)
+                            ->required(),
+
+                        Forms\Components\FileUpload::make('pdf_file')
+                            ->label('Upload PDF')
+                            ->acceptedFileTypes(['application/pdf'])
+                            ->disk('public')
+                            ->required(),
+
+                        Forms\Components\Section::make('Configuration')
+                            ->schema([
+                                Forms\Components\TextInput::make('default_point')
+                                    ->numeric()
+                                    ->default(10)
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('default_exp')
+                                    ->numeric()
+                                    ->default(10)
+                                    ->required(),
+
+                                Forms\Components\Select::make('difficulty')
+                                    ->options([
+                                        'Easy' => 'Easy',
+                                        'Medium' => 'Medium',
+                                        'Hard' => 'Hard',
+                                    ])
+                                    ->default('Medium')
+                                    ->required(),
+
+                                Forms\Components\TextInput::make('timer')
+                                    ->label('Durasi (Menit)')
+                                    ->numeric()
+                                    ->minValue(1)
+                                    ->default(1)
+                                    ->required(),
+                            ])
+                            ->columns(2)
+                            ->collapsed(),
+                    ])
+                    ->action(function (array $data) {
+                        $service = new \App\Services\QuestionGeneratorService();
+
+                        try {
+                            /** -----------------------------
+                             * 1. FIX PATH FILE FILAMENT
+                             * ----------------------------- */
+                            $pdfPath = is_array($data['pdf_file'])
+                                ? $data['pdf_file'][0]
+                                : $data['pdf_file'];
+
+                            $absolutePdfPath = storage_path('app/public/' . $pdfPath);
+
+                            /** -----------------------------
+                             * 2. UPLOAD PDF & EXTRACT TEXT
+                             * ----------------------------- */
+                            $uploadResult = $service->uploadPdf($absolutePdfPath);
+
+                            if (empty(trim($uploadResult['text']))) {
+                                throw new \Exception('Gagal mengekstrak teks dari PDF.');
+                            }
+
+                            /** -----------------------------
+                             * 3. GENERATE QUESTIONS
+                             * ----------------------------- */
+                            $questionsData = $service->generateQuestions(
+                                text: $uploadResult['text'],
+                                sourceId: $uploadResult['source_id'],
+                                instructions: $data['instructions'],
+                                jumlahSoal: (int) $data['jumlah_soal']
+                            );
+
+                            if (empty($questionsData)) {
+                                throw new \Exception('API tidak menghasilkan soal.');
+                            }
+
+                            /** -----------------------------
+                             * 4. SAVE TO DATABASE
+                             * ----------------------------- */
+                            $count = 0;
+
+                            foreach ($questionsData as $qData) {
+                                // DETECT TYPE
+                                // Prioritize explicit type from API, fallback to heuristic
+                                $type = $qData['type'] ?? (isset($qData['options']) ? 'multiple_choice' : 'essay');
+
+                                $quest = \App\Models\Quest::create([
+                                    'title' => $qData['question'],
+                                    'content' => $qData['question'],
+                                    'type' => $type,
+                                    'point' => $data['default_point'],
+                                    'exp' => $data['default_exp'],
+                                    'difficulty' => $data['difficulty'],
+                                    'timer' => $data['timer'],
+                                    'feedback' => $qData['explanation'] ?? null,
+                                ]);
+
+                                // MATCHING - but Quest doesn't support matching, skip or convert
+                                if ($type === 'matching' && isset($qData['pairs']) && is_array($qData['pairs'])) {
+                                    // Skip matching for Quest, or convert to essay
+                                    continue;
+                                }
+                                // MULTIPLE CHOICE
+                                elseif ($type === 'multiple_choice' && isset($qData['options']) && is_array($qData['options'])) {
+                                    foreach ($qData['options'] as $index => $option) {
+                                        $letter = chr(65 + $index); // A, B, C...
+                                        // Check if answer matches letter (A, B) or full content
+                                        $answerRaw = $qData['answer'] ?? '';
+                                        $isCorrect = (strtoupper($answerRaw) === $letter) || ($answerRaw == $option);
+
+                                        \App\Models\QuestAnswer::create([
+                                            'content' => $option,
+                                            'is_correct' => $isCorrect,
+                                            'quest_id' => $quest->id,
+                                        ]);
+                                    }
+                                }
+                                // NON-MULTIPLE CHOICE (Essay, Short Answer, True False)
+                                else {
+                                    $answerContent = $qData['answer_key'] ?? $qData['answer'] ?? null;
+
+                                    if ($answerContent !== null) {
+                                        // Normalize True/False
+                                        if ($type === 'true_false') {
+                                            if (is_bool($answerContent)) {
+                                                $answerContent = $answerContent ? 'true' : 'false';
+                                            } else {
+                                                $answerContent = strtolower((string)$answerContent);
+                                            }
+                                        }
+
+                                        \App\Models\QuestAnswer::create([
+                                            'content' => $answerContent,
+                                            'is_correct' => true,
+                                            'quest_id' => $quest->id,
+                                        ]);
+                                    }
+                                }
+
+                                $count++;
+                            }
+
+                            \Filament\Notifications\Notification::make()
+                                ->title("Successfully generated {$count} quests")
+                                ->success()
+                                ->send();
+
+                        } catch (\Exception $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('Generate Failed')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
