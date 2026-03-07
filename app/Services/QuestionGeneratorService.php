@@ -8,7 +8,7 @@ use Exception;
 
 class QuestionGeneratorService
 {
-    protected string $baseUrl = 'http://72.60.198.84:8006/api/';
+    protected string $baseUrl = 'http://72.60.198.84:8006/api';
 
     /**
      * Upload a PDF file to the Python API and extract text.
